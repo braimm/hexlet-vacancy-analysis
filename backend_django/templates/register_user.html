@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% load django_bootstrap5 %}
+
+{% block content %}
+    <h1 class="my-4">'Registration'</h1>    
+    <form action="{% url 'register_user' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden">
+        
+        <div class="mb-3">
+            <label class="form-label" for="id_email">'email'</label>
+            {% if form.errors.email %}
+                <input type="text" name="email" class="form-control is-invalid" placeholder="user@server.com" required aria-invalid="true" aria-describedby="id_email_helptext" id="id_email" value="{{ email }}">
+                <div class="invalid-feedback">{{ form.errors.email.0 }}</div>
+            {% else %}
+                <input type="text" name="email" autofocus class="form-control" placeholder="user@server.com" required aria-describedby="id_email_helptext" id="id_email" value="{{ email }}">
+            {% endif %}
+            <div class="form-text">
+                'Required field. Input email'
+            </div>
+        </div>
+<!-- ********************************************************************************************** -->
+        <div class="mb-3">
+            <label class="form-label" for="id_password1">'Password'</label>
+            {% if form.errors.password1 %}
+                <input type="password" name="password1" autocomplete="new-password" class="form-control is-invalid" placeholder="'Password'" aria-invalid="true" aria-describedby="id_password1_helptext" id="id_password1">
+                <div class="invalid-feedback">{{ form.errors.password1.0 }}</div>
+            {% else %}
+                <input type="password" name="password1" autocomplete="new-password" class="form-control" placeholder="'Password'" aria-describedby="id_password1_helptext" id="id_password1">
+            {% endif %}
+            <div class="form-text">
+                <ul>
+                    <li>'Your password must contain at least 8 characters.'</li>
+                </ul>
+            </div>
+        </div>
+<!-- ********************************************************************************************** -->
+        <div class="mb-3">
+            <label class="form-label" for="id_password2">'Password Confirmation'</label>
+            {% if form.errors.password2 %}
+                <input type="password" name="password2" autocomplete="new-password" class="form-control is-invalid" placeholder="'Password Confirmation'" aria-invalid="true" aria-describedby="id_password2_helptext" id="id_password2">
+                <div class="invalid-feedback">{{ form.errors.password2.0 }}</div>
+            {% else %}
+                <input type="password" name="password2" autocomplete="new-password" class="form-control" placeholder="'Password Confirmation'" aria-describedby="id_password2_helptext" id="id_password2">
+            {% endif %}
+            <div class="form-text">
+                'Please enter the password again to confirm.'
+            </div>
+        </div>
+
+        <div class="mb-3">
+
+            <div class="form-check">
+            <input type="checkbox" name="accept_terms" class="form-check-input mr-3" id="id_accept_terms">
+            <label class="form-check-label" for="id_accept_terms">Accept Terms</label>
+            </div>
+                
+            <div class="form-text">
+                'Please check to accept terms'
+            </div>
+        </div>
+
+        <input class="btn btn-primary" type="submit" value="'Register'">
+    </form>
+{% endblock %}
