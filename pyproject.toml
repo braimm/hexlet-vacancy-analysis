@@ -11,6 +11,7 @@ django = "^5.2.1"
 requests = "^2.32.3"
 python-dotenv = "^1.1.0"
 django-bootstrap5 = "^25.1"
+argon2-cffi = "^23.1.0"
 
 
 [build-system]

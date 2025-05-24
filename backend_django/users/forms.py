@@ -2,23 +2,22 @@ from django.forms import CharField, PasswordInput
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate
-from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import gettext_lazy as _
 import re
 
 
-SHORT_PASSWORD_MSG = 'The password you entered is too short. \
-                       It must contain at least 3 characters.'
+SHORT_PASSWORD_MSG = 'Pass must contain at least 8 characters, \
+                        mininum one digital and one big letter'
 PASS_NO_MATCH_MSG = 'The passwords entered do not match.'
-EMAIL_ALREADY_EXIST = 'This Email already exists.'
-ACCEPT_TERMS = 'Agreement to terms and condition'
+EMAIL_ALREADY_EXIST_MSG = 'This Email already exists.'
+ACCEPT_TERMS_MSG = 'Agreement to terms and condition'
 
 class CustomLoginUserForm(forms.Form):
     email = forms.EmailField(label='Email')
     password = CharField(label='Password', widget=PasswordInput)
-    
+
     def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request', None)  # извлекаем request, если передан
+        self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
 
     def clean(self):
@@ -29,7 +28,7 @@ class CustomLoginUserForm(forms.Form):
         user = authenticate(email=email, password=password)
         if user is None:
             raise forms.ValidationError('Invalid login or password')
-        self.user = user  # сохранить, чтобы LoginView мог его использовать
+        self.user = user
         return cleaned_data
     
     def get_user(self):
@@ -38,17 +37,19 @@ class CustomLoginUserForm(forms.Form):
 
 class RegisterUserForm(forms.ModelForm):
     email = forms.EmailField(
-        max_length=150,
+        max_length=320,
         required=True,
         label='email'
     )
     password1 = forms.CharField(
         label=_('Password'),
-        widget=forms.PasswordInput
+        widget=forms.PasswordInput,
+        required=True
     )
     password2 = forms.CharField(
         label=_('Password Confirmation'),
-        widget=forms.PasswordInput
+        widget=forms.PasswordInput,
+        required=True
     )
     accept_terms = forms.BooleanField(
         label="I agree to the terms",
@@ -62,20 +63,20 @@ class RegisterUserForm(forms.ModelForm):
     def clean_accept_terms(self):
         accept = self.cleaned_data['accept_terms']
         if accept == False:
-            raise forms.ValidationError(ACCEPT_TERMS)
+            raise forms.ValidationError(ACCEPT_TERMS_MSG)
         return accept
 
     def clean_email(self):
         email = self.cleaned_data['email']
         if get_user_model().objects.filter(email=email).exists():
-            raise forms.ValidationError(EMAIL_ALREADY_EXIST)
+            raise forms.ValidationError(EMAIL_ALREADY_EXIST_MSG)
         return email
 
     def clean_password2(self):
         cd = self.cleaned_data
         if cd.get('password1') and cd.get('password1') != cd.get('password2'):
             raise forms.ValidationError(PASS_NO_MATCH_MSG)
-        if len(cd['password2']) < 3:
+        if not re.match(r'^(?=.*[A-Z])(?=.*\d).{8,}$', cd['password2']):
             raise forms.ValidationError(SHORT_PASSWORD_MSG)
         return cd['password2']
 
