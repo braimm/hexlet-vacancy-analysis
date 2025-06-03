@@ -3,9 +3,9 @@ from django.db import OperationalError
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
-from backend_django.users.mail import safe_send_mail
+from users.logic.mail import safe_send_mail
 import users.exceptions as custom_ex
-from users.validators import check_error_validation, normalize_email
+from users.logic.validators import check_error_validation, normalize_email
 
 from .tokens import account_activation_token
 from django.urls import reverse
@@ -18,6 +18,25 @@ def generate_activation_link(user, domain):
         activation_link = reverse("activate", kwargs={"uidb64": uid, "token": token})
         return f"http://{domain}{activation_link}"
 
+def create_activation_mail(user, data):
+    domain = data.get("domain")
+    activate_url = generate_activation_link(user, domain)
+    
+    message = render_to_string("activation_email.html", {
+        "user": user,
+        "activate_url": activate_url,
+    })
+    return message
+
+def create_user(data):
+    email = normalize_email(data.get("email"))
+    password = data.get("password")
+    user = User.objects.create_user(email=email)
+    user.set_password(password)
+    user.is_active = False
+    user.save()
+    return user
+
 def register_user(data):
     # Validation
     if check := check_error_validation(data):
@@ -25,25 +44,14 @@ def register_user(data):
         raise custom_ex.ValidationError(message=msg, code=status)
 
     # Create a user
-    email = normalize_email(data.get("email"))
-    password = data.get("password")
     try:
-        user = User.objects.create_user(email=email)
-        user.set_password(password)
-        user.is_active = False
-        user.save()
+        user = create_user(data)
     except OperationalError:
         raise custom_ex.CreateUserError(message="Database Errors", code=500)
 
     # Send message with activation link
-    domain = data["domain"]
-    activate_url = generate_activation_link(user, domain)
-    
-    message = render_to_string("activation_email.html", {
-        "user": user,
-        "activate_url": activate_url,
-    })
     try:
+        message = create_activation_mail(user, data)
         safe_send_mail(message=message, recipient=[user.email])
     except custom_ex.SendEmailError as e:
         raise

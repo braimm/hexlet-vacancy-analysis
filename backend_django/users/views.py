@@ -1,21 +1,19 @@
-import json
 from django.views import View
 from django.contrib.auth import get_user_model
 from django.contrib.auth import logout, login, authenticate
 from django.http import JsonResponse
-from users.utils import read_data_from_request
-from users.authentication import generate_activation_link, register_user
-from users.validators import check_error_validation, normalize_email
+from users.logic.utils import read_data_from_request
+from users.logic.registration import register_user
+from users.logic.validators import normalize_email
 import users.exceptions as custom_ex
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 from django.contrib.auth import get_user_model
-from django.core.mail import send_mail
 
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib.sites.shortcuts import get_current_site
-from .tokens import account_activation_token
+from .logic.tokens import account_activation_token
 import logging
 
 User = get_user_model()
@@ -81,14 +79,12 @@ class ActivateUser(View):
 @method_decorator(csrf_exempt, name="dispatch")
 class LoginUserView(View):
    def post(self, request):
-        if request.content_type != "application/json":
-            return JsonResponse({"status": "error", "message": "Expected application/json"}, status=415)
-
-        # Trying to read JSON
+        # Read data from request
         try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+            data  = read_data_from_request(request)
+        except custom_ex.ValidationError as e:
+            logger.error(f"Validation Error: {e.message}")
+            return e.to_response()
         
         email = normalize_email(data.get("email"))
         password = data.get("password")
