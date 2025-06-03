@@ -5,4 +5,6 @@ __pycache__
 *.sqlite3
 *.xml
 arhiv.py
-test_fixtures.txt
+# test_fixtures.txt
+# test_fixtures.sh
+# error.html
