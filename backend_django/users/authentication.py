@@ -1,4 +1,5 @@
 from django.contrib.auth.backends import ModelBackend
+
 from django.contrib.auth import get_user_model
 
 
@@ -11,3 +12,5 @@ class EmailAuthBackend(ModelBackend):
                 return user
         except (UserModel.DoesNotExist,UserModel.MultipleObjectsReturned):
             return None
+
+

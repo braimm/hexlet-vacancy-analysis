@@ -3,22 +3,8 @@ from . import views
 
 
 urlpatterns = [
-    path('register_classic/', views.CreateUserView_classic.as_view(), name='register_user_classic'),
-    path('activate__classic/<uidb64>/<token>/', views.activate_user_classic, name='activate_classic'),
-    path('login_classic/', views.LoginUserView_classic.as_view(), name='login_classic'),
-    path('logout_classic/', views.LogoutUserView_classic.as_view(), name='logout_classic'),
     path('register/', views.CreateUserView.as_view(), name='register_user'),
     path('activate/<uidb64>/<token>/', views.ActivateUser.as_view(), name='activate'),
     path('login/', views.LoginUserView.as_view(), name='login'),
     path('logout/', views.LogoutUserView.as_view(), name='logout'),
-    # path(
-    #     '<int:pk>/delete/',
-    #     views.DeleteUserView.as_view(),
-    #     name='delete_user'
-    # ),
-    # path(
-    #     '<int:pk>/update/',
-    #     views.UpdateUserView.as_view(),
-    #     name='update_user'
-    # ),
 ]

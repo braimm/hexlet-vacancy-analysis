@@ -1,0 +1,8 @@
+.venv
+.env
+dist/
+__pycache__
+*.sqlite3
+*.xml
+arhiv.py
+test_fixtures.txt

@@ -16,8 +16,6 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-# from backend_django.config import IndexView
-# from backend_django.config import views
 from . import views
 
 urlpatterns = [
@@ -25,3 +23,6 @@ urlpatterns = [
     path('', views.IndexView.as_view(), name='start_page'),
     path('auth/', include('users.urls')),
 ]
+
+handler500 = views.custom_server_error
+handler404 = views.custom_not_found_error
