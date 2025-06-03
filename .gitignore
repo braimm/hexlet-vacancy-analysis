@@ -1,0 +1,9 @@
+test_fixtures.sh
+error.html
+.venv
+.env
+dist/
+__pycache__
+*.sqlite3
+*.xml
+arhiv.py
