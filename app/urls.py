@@ -16,8 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('hh/', include('app.services.hh.hh_parser.urls')),
+    path('auth/', include('app.users.urls')),
 ]
+
+handler500 = views.custom_server_error
+handler404 = views.custom_not_found_error
