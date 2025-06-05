@@ -14,3 +14,5 @@ db.sqlite3
 PATH
 itlabormarket_project_plan.md
 postgres
+test_fixtures.sh
+error.html
